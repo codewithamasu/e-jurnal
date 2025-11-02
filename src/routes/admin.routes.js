@@ -26,88 +26,276 @@ import {
 
 const router = express.Router();
 
-// POST /api/admin/register
-// 1. checkAuth -> Cek ada token & valid?
-// 2. checkRole(['admin']) -> Cek tokennya punya role 'admin'?
-// 3. registerGuru -> Jika lolos, jalankan controller
-router.post('/register', checkAuth, checkRole(['admin']), registerGuru);
+/**
+ * @swagger
+ * tags:
+ *   - name: Admin - Mapel
+ *     description: API untuk mengelola data Mata Pelajaran
+ *   - name: Admin - Kelas
+ *     description: API untuk mengelola data Kelas
+ *   - name: Admin - Jurusan
+ *     description: API untuk mengelola data Jurusan
+ *   - name: Admin - Siswa
+ *     description: API untuk mengelola data Siswa
+ *   - name: Admin - Jadwal
+ *     description: API untuk mengelola data Jadwal
+ */
 
-// Rute untuk CRUD Mapel
-// Semua rute ini hanya bisa diakses oleh 'admin' yang sudah login
-
-// POST /api/admin/mapel
+/**
+ * @swagger
+ * /admin/mapel:
+ *   post:
+ *     summary: (Admin) Membuat Mapel baru
+ *     tags: [Admin - Mapel]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nama_mapel
+ *             properties:
+ *               nama_mapel:
+ *                 type: string
+ *                 example: "Bahasa Jepang"
+ *     responses:
+ *       '201':
+ *         description: Mapel berhasil dibuat
+ *       '400':
+ *         description: Nama mapel tidak boleh kosong
+ *       '401':
+ *         description: Tidak terautentikasi
+ *       '403':
+ *         description: Akses ditolak
+ *       '409':
+ *         description: Nama mapel sudah ada
+ */
 router.post('/mapel', checkAuth, checkRole(['admin']), createMapel);
 
-// GET /api/admin/mapel
+/**
+ * @swagger
+ * /admin/mapel:
+ *   get:
+ *     summary: (Admin) Mengambil semua data Mapel
+ *     tags: [Admin - Mapel]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Sukses mengambil data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_mapel:
+ *                     type: integer
+ *                     example: 1
+ *                   nama_mapel:
+ *                     type: string
+ *                     example: "Matematika"
+ *       '401':
+ *         description: Tidak terautentikasi
+ *       '403':
+ *         description: Akses ditolak
+ */
 router.get('/mapel', checkAuth, checkRole(['admin']), getAllMapel);
 
-// PUT /api/admin/mapel/:id
-router.put('/mapel/:id', checkAuth, checkRole(['admin']), updateMapel);
-
-// DELETE /api/admin/mapel/:id
-router.delete('/mapel/:id', checkAuth, checkRole(['admin']), deleteMapel);
-
-// Rute untuk CRUD Jadwal (Hanya Admin)
-// POST /api/admin/jadwal (Membuat jadwal baru)
-router.post('/jadwal', checkAuth, checkRole(['admin']), createJadwal);
-
-// GET /api/admin/jadwal (Melihat semua jadwal)
-router.get('/jadwal', checkAuth, checkRole(['admin']), getAllJadwal);
-
-// GET /api/admin/jadwal/guru/:id_guru (Melihat jadwal per guru)
-router.get(
-  '/jadwal/guru/:id_guru',
-  checkAuth,
-  checkRole(['admin']),
-  getJadwalByGuru
-);
-
-// DELETE /api/admin/jadwal/:id_jadwal (Menghapus jadwal)
-router.delete(
-  '/jadwal/:id_jadwal',
-  checkAuth,
-  checkRole(['admin']),
-  deleteJadwal
-);
-
-// Rute untuk CRUD Kelas (Hanya Admin)
-// POST /api/admin/kelas
+/**
+ * @swagger
+ * /admin/kelas:
+ *   post:
+ *     summary: (Admin) Membuat data Kelas baru
+ *     tags: [Admin - Kelas]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nama_kelas
+ *             properties:
+ *               nama_kelas:
+ *                 type: string
+ *                 example: "XII RPL 1"
+ *     responses:
+ *       '201':
+ *         description: Kelas berhasil dibuat
+ *       '400':
+ *         description: Nama kelas tidak boleh kosong
+ *       '409':
+ *         description: Nama kelas sudah ada
+ */
 router.post('/kelas', checkAuth, checkRole(['admin']), createKelas);
 
-// GET /api/admin/kelas
+/**
+ * @swagger
+ * /admin/kelas:
+ *   get:
+ *     summary: (Admin) Mengambil semua data Kelas
+ *     tags: [Admin - Kelas]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Sukses mengambil data kelas
+ */
 router.get('/kelas', checkAuth, checkRole(['admin']), getAllKelas);
 
-// PUT /api/admin/kelas/:id
-router.put('/kelas/:id', checkAuth, checkRole(['admin']), updateKelas);
-
-// DELETE /api/admin/kelas/:id
-router.delete('/kelas/:id', checkAuth, checkRole(['admin']), deleteKelas);
-
-// Rute untuk CRUD Jurusan (Hanya Admin)
-// POST /api/admin/jurusan
+/**
+ * @swagger
+ * /admin/jurusan:
+ *   post:
+ *     summary: (Admin) Membuat Jurusan baru
+ *     tags: [Admin - Jurusan]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nama_jurusan
+ *             properties:
+ *               nama_jurusan:
+ *                 type: string
+ *                 example: "Teknik Komputer dan Jaringan"
+ *     responses:
+ *       '201':
+ *         description: Jurusan berhasil dibuat
+ */
 router.post('/jurusan', checkAuth, checkRole(['admin']), createJurusan);
 
-// GET /api/admin/jurusan
+/**
+ * @swagger
+ * /admin/jurusan:
+ *   get:
+ *     summary: (Admin) Mengambil semua data Jurusan
+ *     tags: [Admin - Jurusan]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Sukses mengambil data jurusan
+ */
 router.get('/jurusan', checkAuth, checkRole(['admin']), getAllJurusan);
 
-// PUT /api/admin/jurusan/:id
-router.put('/jurusan/:id', checkAuth, checkRole(['admin']), updateJurusan);
-
-// DELETE /api/admin/jurusan/:id
-router.delete('/jurusan/:id', checkAuth, checkRole(['admin']), deleteJurusan);
-
-// Rute untuk CRUD Siswa
-// POST /api/admin/siswa
+/**
+ * @swagger
+ * /admin/siswa:
+ *   post:
+ *     summary: (Admin) Membuat data Siswa baru
+ *     tags: [Admin - Siswa]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nama
+ *               - nis
+ *               - id_kelas
+ *             properties:
+ *               nama:
+ *                 type: string
+ *                 example: "Budi Setiawan"
+ *               nis:
+ *                 type: string
+ *                 example: "20241023"
+ *               id_kelas:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       '201':
+ *         description: Siswa berhasil dibuat
+ */
 router.post('/siswa', checkAuth, checkRole(['admin']), createSiswa);
 
-// GET /api/admin/siswa
+/**
+ * @swagger
+ * /admin/siswa:
+ *   get:
+ *     summary: (Admin) Mengambil semua data Siswa
+ *     tags: [Admin - Siswa]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Sukses mengambil data siswa
+ */
 router.get('/siswa', checkAuth, checkRole(['admin']), getAllSiswa);
 
-// PUT /api/admin/siswa/:id
-router.put('/siswa/:id', checkAuth, checkRole(['admin']), updateSiswa);
+/**
+ * @swagger
+ * /admin/jadwal:
+ *   post:
+ *     summary: (Admin) Membuat jadwal baru
+ *     tags: [Admin - Jadwal]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id_mapel
+ *               - id_guru
+ *               - id_kelas
+ *               - hari
+ *               - jam_mulai
+ *               - jam_selesai
+ *             properties:
+ *               id_mapel:
+ *                 type: integer
+ *                 example: 1
+ *               id_guru:
+ *                 type: integer
+ *                 example: 3
+ *               id_kelas:
+ *                 type: integer
+ *                 example: 2
+ *               hari:
+ *                 type: string
+ *                 example: "Senin"
+ *               jam_mulai:
+ *                 type: string
+ *                 example: "07:00"
+ *               jam_selesai:
+ *                 type: string
+ *                 example: "08:30"
+ *     responses:
+ *       '201':
+ *         description: Jadwal berhasil dibuat
+ */
+router.post('/jadwal', checkAuth, checkRole(['admin']), createJadwal);
 
-// DELETE /api/admin/siswa/:id
-router.delete('/siswa/:id', checkAuth, checkRole(['admin']), deleteSiswa);
-
+/**
+ * @swagger
+ * /admin/jadwal:
+ *   get:
+ *     summary: (Admin) Mengambil semua jadwal
+ *     tags: [Admin - Jadwal]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Sukses mengambil data jadwal
+ */
+router.get('/jadwal', checkAuth, checkRole(['admin']), getAllJadwal);
 
 export default router;
