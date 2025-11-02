@@ -318,6 +318,7 @@ export const deleteKelas = async (req, res) => {
 };
 
 // -- CRUD UNTUK JURUSAN --
+
 // 1. CREATE Jurusan
 export const createJurusan = async (req, res) => {
   const { nama_jurusan } = req.body;
@@ -388,6 +389,105 @@ export const deleteJurusan = async (req, res) => {
     // Tangani jika jurusan tidak bisa dihapus karena masih dipakai kelas/guru
     if (error.code === 'P2003') {
       return res.status(409).json({ msg: 'Gagal hapus: Jurusan masih terkait dengan kelas atau guru.' });
+    }
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+// ----- CRUD UNTUK SISWA -----
+
+// 1. CREATE Siswa
+export const createSiswa = async (req, res) => {
+  const { nis, nama_lengkap, jenis_kelamin, id_kelas } = req.body;
+
+  if (!nis || !nama_lengkap || !id_kelas) {
+    return res
+      .status(400)
+      .json({ msg: 'NIS, Nama Lengkap, dan ID Kelas wajib diisi' });
+  }
+
+  try {
+    const newSiswa = await prisma.siswa.create({
+      data: {
+        nis: nis,
+        nama_lengkap: nama_lengkap,
+        jenis_kelamin: jenis_kelamin || 'L', // Default 'L' jika tidak diisi
+        id_kelas: parseInt(id_kelas),
+      },
+      include: {
+        kelas: { select: { nama_kelas: true } }, // Tampilkan nama kelas
+      },
+    });
+    res.status(201).json({ msg: 'Siswa berhasil ditambahkan', data: newSiswa });
+  } catch (error) {
+    if (error.code === 'P2002') { // Error NIS duplikat
+      return res.status(409).json({ msg: 'NIS sudah terdaftar' });
+    }
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+// 2. READ All Siswa (Bisa juga difilter per kelas jika mau)
+export const getAllSiswa = async (req, res) => {
+  try {
+    const allSiswa = await prisma.siswa.findMany({
+      orderBy: { nama_lengkap: 'asc' },
+      include: {
+        kelas: { select: { nama_kelas: true } },
+      },
+    });
+    res.status(200).json(allSiswa);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+// 3. UPDATE Siswa
+export const updateSiswa = async (req, res) => {
+  const { id } = req.params; // Ini adalah id_siswa
+  const { nis, nama_lengkap, jenis_kelamin, id_kelas } = req.body;
+
+  try {
+    const updatedSiswa = await prisma.siswa.update({
+      where: { id_siswa: parseInt(id) },
+      data: {
+        nis: nis,
+        nama_lengkap: nama_lengkap,
+        jenis_kelamin: jenis_kelamin,
+        id_kelas: id_kelas ? parseInt(id_kelas) : undefined,
+      },
+      include: {
+        kelas: { select: { nama_kelas: true } },
+      },
+    });
+    res.status(200).json({ msg: 'Data siswa berhasil diupdate', data: updatedSiswa });
+  } catch (error) {
+    if (error.code === 'P2025') { // Not Found
+      return res.status(404).json({ msg: 'Siswa tidak ditemukan' });
+    }
+    if (error.code === 'P2002') {
+      return res.status(409).json({ msg: 'NIS sudah terdaftar' });
+    }
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+// 4. DELETE Siswa
+export const deleteSiswa = async (req, res) => {
+  const { id } = req.params; // Ini adalah id_siswa
+
+  try {
+    await prisma.siswa.delete({
+      where: { id_siswa: parseInt(id) },
+    });
+    res.status(200).json({ msg: 'Siswa berhasil dihapus' });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ msg: 'Siswa tidak ditemukan' });
+    }
+    // Jika siswa punya data absensi terkait
+    if (error.code === 'P2003') {
+      return res.status(409).json({ msg: 'Gagal hapus: Siswa masih memiliki data absensi terkait.' });
     }
     res.status(500).json({ msg: error.message });
   }

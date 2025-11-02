@@ -111,14 +111,11 @@ export const submitJurnalDanAbsensi = async (req, res) => {
       });
 
       // Langkah B: Siapkan data absensi
-      const idJurnalBaru = newJurnal.id_jurnal;
-
       const dataAbsensi = absensiSiswa.map((absen) => {
         if (!absen.id_siswa || !absen.status) {
           throw new Error('Setiap siswa harus memiliki id_siswa dan status');
         }
         return {
-          id_jurnal: idJurnalBaru,
           id_siswa: parseInt(absen.id_siswa),
           id_jadwal: parseInt(id_jadwal), // Kita simpan id_jadwal juga
           tanggal: new Date(tanggal),

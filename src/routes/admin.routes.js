@@ -17,7 +17,11 @@ import {
   createJurusan,
   getAllJurusan,
   updateJurusan,
-  deleteJurusan
+  deleteJurusan,
+  createSiswa,
+  getAllSiswa,
+  updateSiswa,
+  deleteSiswa
 } from '../controllers/admin.controllers.js';
 
 const router = express.Router();
@@ -91,6 +95,19 @@ router.put('/jurusan/:id', checkAuth, checkRole(['admin']), updateJurusan);
 
 // DELETE /api/admin/jurusan/:id
 router.delete('/jurusan/:id', checkAuth, checkRole(['admin']), deleteJurusan);
+
+// Rute untuk CRUD Siswa
+// POST /api/admin/siswa
+router.post('/siswa', checkAuth, checkRole(['admin']), createSiswa);
+
+// GET /api/admin/siswa
+router.get('/siswa', checkAuth, checkRole(['admin']), getAllSiswa);
+
+// PUT /api/admin/siswa/:id
+router.put('/siswa/:id', checkAuth, checkRole(['admin']), updateSiswa);
+
+// DELETE /api/admin/siswa/:id
+router.delete('/siswa/:id', checkAuth, checkRole(['admin']), deleteSiswa);
 
 
 export default router;
