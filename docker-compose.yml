@@ -1,34 +1,31 @@
-# 'services' adalah daftar "komputer mini" (kontainer) yang ingin kita jalankan
 services:
-  # Kita beri nama layanan kita 'db'
+  # 1. Service Database (MySQL)
   db:
-    # Menggunakan image MySQL versi 8.0
     image: mysql:8.0
-    
-    # Beri nama kontainer agar mudah dikenali di 'docker ps'
-    container_name: mysql_ejurnal_guru
-    
-    # Selalu restart kontainer ini jika crash
-    restart: always
-    
-    # Variabel lingkungan untuk konfigurasi MySQL
+    container_name: ejurnal_db
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: hamasu  # GANTI INI
-      MYSQL_DATABASE: db_ejurnal_guru_smkn5              # Opsional: langsung buat database
-    
-    # Petakan port 3306 di Mac Anda ke port 3306 di kontainer
+      MYSQL_ROOT_PASSWORD: hamasu 
+      MYSQL_DATABASE: db_ejurnal_guru_smkn5 
     ports:
       - "3306:3306"
-      
-    # ⭐️ BAGIAN TERPENTING: Volume
-    # Ini "menghubungkan" folder /var/lib/mysql di dalam kontainer
-    # ke sebuah volume bernama 'mysql-data' yang dikelola Docker.
-    # Data Anda akan AMAN di sini.
     volumes:
-      - mysql-data:/var/lib/mysql
+      - db-data:/var/lib/mysql
 
-# 'volumes' adalah tempat kita mendefinisikan volume yang kita sebut di atas
+  # 2. Service Aplikasi (Node.js)
+  app:
+    container_name: ejurnal_app
+    build: .
+    restart: unless-stopped
+    ports:
+      # Port 3000 dari container ke port 3000 di komputer host
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "mysql://root:hamasu@db:3306/db_ejurnal_guru_smkn5" 
+      JWT_SECRET: "9605e8ab00caac7855fcd4f18cab94e34c441885d5b8dce3502762e29d33be4a"
+      PORT: 3000
+    depends_on:
+      - db
+
 volumes:
-  mysql-data:
-    # 'driver: local' adalah default, tidak perlu ditulis,
-    # tapi ini menegaskan kita menyimpan data di Mac kita.
+  db-data:
