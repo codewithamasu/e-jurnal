@@ -21,7 +21,8 @@ import {
   createSiswa,
   getAllSiswa,
   updateSiswa,
-  deleteSiswa
+  deleteSiswa,
+  getAllUsers
 } from '../controllers/admin.controllers.js';
 
 const router = express.Router();
@@ -297,5 +298,7 @@ router.post('/jadwal', checkAuth, checkRole(['admin']), createJadwal);
  *         description: Sukses mengambil data jadwal
  */
 router.get('/jadwal', checkAuth, checkRole(['admin']), getAllJadwal);
+
+router.get('/users', checkAuth, checkRole(['admin'], getAllUsers));
 
 export default router;

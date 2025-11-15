@@ -492,3 +492,45 @@ export const deleteSiswa = async (req, res) => {
     res.status(500).json({ msg: error.message });
   }
 };
+
+/**
+ * Ambil semua data guru yang sudah didaftarkan admin
+ */
+export const getAllUsers = async (req, res) => {
+  try {
+    const guruList = await prisma.guru.findMany({
+      include: {
+        jurusan: true, // ambil nama jurusan kalau ada
+      },
+      orderBy: { id_guru: "asc" },
+    });
+
+    // Format agar match dengan frontend
+    const users = guruList.map((g) => ({
+      nip: g.nip,
+      nama: g.nama_lengkap,
+      role:
+        g.role === "admin"
+          ? "Admin"
+          : g.role === "kepsek"
+          ? "Kepsek"
+          : "Guru",
+      jurusan: g.jurusan?.nama_jurusan || "-",
+      kelas: [], // nanti bisa diisi dari tabel kelas kalau mau
+      mapel: [], // bisa dikembangkan juga dari tabel jadwal
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: "Data guru berhasil diambil",
+      users,
+    });
+  } catch (error) {
+    console.error("❌ Error getAllUsers:", error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal mengambil data guru",
+      error: error.message,
+    });
+  }
+};

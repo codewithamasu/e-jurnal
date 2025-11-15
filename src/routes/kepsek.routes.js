@@ -3,6 +3,7 @@ import express from 'express';
 import {
   getAllJurnalHarian,
   getDetailJurnalById,
+  getRekapMingguan,
 } from '../controllers/kepsek.controllers.js';
 import { checkAuth, checkRole } from '../middlewares/auth.middlewares.js';
 
@@ -158,5 +159,36 @@ router.get(
   checkRole(['kepsek']), // Hanya Kepala Sekolah yang dapat mengakses
   getDetailJurnalById
 );
+
+/**
+ * @swagger
+ * /kepsek/rekap/mingguan:
+ *   get:
+ *     summary: (Kepsek) Mengambil rekap absensi mingguan semua siswa
+ *     tags: [Kepsek]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: tanggal
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: (Opsional) Tanggal apapun di dalam minggu yang ingin dilihat (YYYY-MM-DD). Default-nya minggu ini.
+ *     responses:
+ *       '200':
+ *         description: Sukses mengambil data rekapitulasi mingguan.
+ *       '401':
+ *         description: Token tidak valid.
+ *       '403':
+ *         description: Akses ditolak (bukan Kepsek atau Admin).
+ */
+router.get(
+  '/rekap/mingguan',
+  checkAuth,
+  checkRole(['kepsek', 'admin']),
+  getRekapMingguan
+);
+
 
 export default router;

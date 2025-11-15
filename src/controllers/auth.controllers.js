@@ -12,8 +12,8 @@ export const loginAdmin = async (req, res) => {
     }
 
     // 2. Cek kredensial admin (hardcoded)
-    const ADMIN_USERNAME = 'admin';
-    const ADMIN_PASSWORD = 'admin123';
+    const ADMIN_USERNAME = '1992502';
+    const ADMIN_PASSWORD = 'iyan-225';
 
     if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
       return res.status(401).json({ msg: 'Username atau password salah' });
